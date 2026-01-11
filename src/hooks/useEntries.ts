@@ -1,49 +1,49 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { DayEntry, Status, UserStats } from '@/types';
 import { formatDate, isPast, isToday } from '@/lib/dateUtils';
-import { differenceInDays, parseISO, subDays } from 'date-fns';
+import { apiService } from '@/services/api';
 
-// Demo data for showcase
-const generateDemoData = (): DayEntry[] => {
-  const entries: DayEntry[] = [];
-  const today = new Date();
-  const descriptions = [
-    'Built new feature for the dashboard',
-    'Completed algorithm practice',
-    'Morning workout routine',
-    'Client meeting and planning',
-    'Designed new UI components',
-    'Code review and refactoring',
-    'Learned new framework concepts',
-    'Team standup and sprint planning',
-  ];
-
-  // Generate random entries for the past 180 days
-  for (let i = 0; i < 180; i++) {
-    const date = subDays(today, i);
-    const random = Math.random();
-
-    // 70% chance of having an entry
-    if (random > 0.3) {
-      const status: Status = random > 0.5 ? 'complete' : 'partial';
-      entries.push({
-        id: `demo-${i}`,
-        date: formatDate(date),
-        status,
-        description: descriptions[Math.floor(Math.random() * descriptions.length)],
-        achievement: `${Math.floor(Math.random() * 8) + 1} hours`,
-        duration: Math.floor(Math.random() * 480) + 60,
-        createdAt: date.toISOString(),
-        updatedAt: date.toISOString(),
-      });
-    }
-  }
-
-  return entries;
-};
+// For now, using a hardcoded userId. In production, this should come from authentication
+const CURRENT_USER_ID = 'user_default';
 
 export const useEntries = () => {
-  const [entries, setEntries] = useState<DayEntry[]>(() => generateDemoData());
+  const [entries, setEntries] = useState<DayEntry[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch entries from MongoDB
+  const fetchEntries = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await apiService.getEntries(CURRENT_USER_ID);
+
+      if (response.success && response.data) {
+        // Transform MongoDB entries to match our DayEntry interface
+        const transformedEntries = (response.data as any[]).map((entry: any) => ({
+          id: entry._id,
+          date: entry.date,
+          status: entry.status,
+          description: entry.description,
+          achievement: entry.achievement,
+          duration: entry.duration,
+          createdAt: entry.createdAt,
+          updatedAt: entry.updatedAt,
+        }));
+        setEntries(transformedEntries);
+      }
+    } catch (err) {
+      console.error('Error fetching entries:', err);
+      setError(err instanceof Error ? err.message : 'Failed to fetch entries');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Initial fetch
+  useEffect(() => {
+    fetchEntries();
+  }, [fetchEntries]);
 
   const entriesMap = useMemo(() => {
     const map = new Map<string, DayEntry>();
@@ -63,28 +63,78 @@ export const useEntries = () => {
     return 'none';
   }, [getEntryForDate]);
 
-  const addEntry = useCallback((entry: Omit<DayEntry, 'id' | 'createdAt' | 'updatedAt'>) => {
-    const now = new Date().toISOString();
-    const newEntry: DayEntry = {
-      ...entry,
-      id: `entry-${Date.now()}`,
-      createdAt: now,
-      updatedAt: now,
-    };
-    setEntries(prev => [...prev.filter(e => e.date !== entry.date), newEntry]);
-    return newEntry;
+  const addEntry = useCallback(async (entry: Omit<DayEntry, 'id' | 'createdAt' | 'updatedAt'>) => {
+    try {
+      const response = await apiService.createEntry({
+        userId: CURRENT_USER_ID,
+        date: entry.date,
+        status: entry.status,
+        description: entry.description,
+        achievement: entry.achievement,
+        duration: entry.duration,
+      });
+
+      if (response.success && response.data) {
+        const newEntry: DayEntry = {
+          id: (response.data as any)._id,
+          date: (response.data as any).date,
+          status: (response.data as any).status,
+          description: (response.data as any).description,
+          achievement: (response.data as any).achievement,
+          duration: (response.data as any).duration,
+          createdAt: (response.data as any).createdAt,
+          updatedAt: (response.data as any).updatedAt,
+        };
+
+        setEntries(prev => [...prev.filter(e => e.date !== entry.date), newEntry]);
+        return newEntry;
+      }
+    } catch (err) {
+      console.error('Error adding entry:', err);
+      setError(err instanceof Error ? err.message : 'Failed to add entry');
+      throw err;
+    }
   }, []);
 
-  const updateEntry = useCallback((id: string, updates: Partial<DayEntry>) => {
-    setEntries(prev => prev.map(entry =>
-      entry.id === id
-        ? { ...entry, ...updates, updatedAt: new Date().toISOString() }
-        : entry
-    ));
+  const updateEntry = useCallback(async (id: string, updates: Partial<DayEntry>) => {
+    try {
+      const response = await apiService.updateEntry(id, {
+        status: updates.status,
+        description: updates.description,
+        achievement: updates.achievement,
+        duration: updates.duration,
+      });
+
+      if (response.success && response.data) {
+        setEntries(prev => prev.map(entry =>
+          entry.id === id
+            ? {
+              ...entry,
+              ...(response.data as any),
+              id: (response.data as any)._id,
+            }
+            : entry
+        ));
+      }
+    } catch (err) {
+      console.error('Error updating entry:', err);
+      setError(err instanceof Error ? err.message : 'Failed to update entry');
+      throw err;
+    }
   }, []);
 
-  const deleteEntry = useCallback((id: string) => {
-    setEntries(prev => prev.filter(entry => entry.id !== id));
+  const deleteEntry = useCallback(async (id: string) => {
+    try {
+      const response = await apiService.deleteEntry(id);
+
+      if (response.success) {
+        setEntries(prev => prev.filter(entry => entry.id !== id));
+      }
+    } catch (err) {
+      console.error('Error deleting entry:', err);
+      setError(err instanceof Error ? err.message : 'Failed to delete entry');
+      throw err;
+    }
   }, []);
 
   const stats = useMemo((): UserStats => {
@@ -100,9 +150,11 @@ export const useEntries = () => {
       const entry = entriesMap.get(formatDate(checkDate));
       if (entry && (entry.status === 'complete' || entry.status === 'partial')) {
         currentStreak++;
-        checkDate = subDays(checkDate, 1);
+        checkDate = new Date(checkDate);
+        checkDate.setDate(checkDate.getDate() - 1);
       } else if (isToday(checkDate)) {
-        checkDate = subDays(checkDate, 1);
+        checkDate = new Date(checkDate);
+        checkDate.setDate(checkDate.getDate() - 1);
       } else {
         break;
       }
@@ -119,9 +171,11 @@ export const useEntries = () => {
         if (i === 0) {
           tempStreak = 1;
         } else {
-          const prevDate = parseISO(sortedDates[i - 1]);
-          const currDate = parseISO(sortedDates[i]);
-          if (differenceInDays(currDate, prevDate) === 1) {
+          const prevDate = new Date(sortedDates[i - 1]);
+          const currDate = new Date(sortedDates[i]);
+          const diffDays = Math.floor((currDate.getTime() - prevDate.getTime()) / (1000 * 60 * 60 * 24));
+
+          if (diffDays === 1) {
             tempStreak++;
           } else {
             tempStreak = 1;
@@ -155,5 +209,8 @@ export const useEntries = () => {
     updateEntry,
     deleteEntry,
     stats,
+    loading,
+    error,
+    refetch: fetchEntries,
   };
 };
