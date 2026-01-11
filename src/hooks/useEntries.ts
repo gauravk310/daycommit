@@ -3,9 +3,6 @@ import { DayEntry, Status, UserStats } from '@/types';
 import { formatDate, isPast, isToday } from '@/lib/dateUtils';
 import { apiService } from '@/services/api';
 
-// For now, using a hardcoded userId. In production, this should come from authentication
-const CURRENT_USER_ID = 'user_default';
-
 export const useEntries = () => {
   const [entries, setEntries] = useState<DayEntry[]>([]);
   const [loading, setLoading] = useState(true);
@@ -16,7 +13,7 @@ export const useEntries = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await apiService.getEntries(CURRENT_USER_ID);
+      const response = await apiService.getEntries();
 
       if (response.success && response.data) {
         // Transform MongoDB entries to match our DayEntry interface
@@ -66,7 +63,6 @@ export const useEntries = () => {
   const addEntry = useCallback(async (entry: Omit<DayEntry, 'id' | 'createdAt' | 'updatedAt'>) => {
     try {
       const response = await apiService.createEntry({
-        userId: CURRENT_USER_ID,
         date: entry.date,
         status: entry.status,
         description: entry.description,

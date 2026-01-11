@@ -9,16 +9,21 @@ interface ApiResponse<T> {
 }
 
 class ApiService {
+    private getHeaders(): HeadersInit {
+        const token = localStorage.getItem('token');
+        return {
+            'Content-Type': 'application/json',
+            ...(token && { Authorization: `Bearer ${token}` }),
+        };
+    }
+
     private async request<T>(
         endpoint: string,
         options?: RequestInit
     ): Promise<ApiResponse<T>> {
         try {
             const response = await fetch(`${API_URL}${endpoint}`, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...options?.headers,
-                },
+                headers: this.getHeaders(),
                 ...options,
             });
 
@@ -36,16 +41,15 @@ class ApiService {
     }
 
     // Entry endpoints
-    async getEntries(userId: string) {
-        return this.request(`/entries/${userId}`);
+    async getEntries() {
+        return this.request('/entries');
     }
 
-    async getEntryByDate(userId: string, date: string) {
-        return this.request(`/entries/${userId}/${date}`);
+    async getEntryByDate(date: string) {
+        return this.request(`/entries/${date}`);
     }
 
     async createEntry(entryData: {
-        userId: string;
         date: string;
         status: string;
         description: string;
@@ -79,8 +83,8 @@ class ApiService {
         });
     }
 
-    async getUserStats(userId: string) {
-        return this.request(`/entries/${userId}/stats`);
+    async getUserStats() {
+        return this.request('/entries/stats');
     }
 
     // Health check
