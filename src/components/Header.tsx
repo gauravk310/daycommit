@@ -33,23 +33,23 @@ export const Header = ({ stats }: HeaderProps) => {
                 onClick={() => navigate('/')}
                 className={cn(
                   'px-4 py-2 rounded-lg text-sm font-medium transition-colors',
-                  location.pathname === '/' 
-                    ? 'bg-secondary text-foreground' 
+                  location.pathname === '/'
+                    ? 'bg-secondary text-foreground'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
+                )}
+              >
+                Home
+              </button>
+              <button
+                onClick={() => navigate('/dashboard')}
+                className={cn(
+                  'px-4 py-2 rounded-lg text-sm font-medium transition-colors',
+                  location.pathname === '/dashboard'
+                    ? 'bg-secondary text-foreground'
                     : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
                 )}
               >
                 Dashboard
-              </button>
-              <button
-                onClick={() => navigate('/commit')}
-                className={cn(
-                  'px-4 py-2 rounded-lg text-sm font-medium transition-colors',
-                  location.pathname === '/commit' 
-                    ? 'bg-secondary text-foreground' 
-                    : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
-                )}
-              >
-                New Commit
               </button>
             </nav>
           </div>
@@ -61,7 +61,7 @@ export const Header = ({ stats }: HeaderProps) => {
                 <span className="font-mono font-semibold text-foreground">{stats.currentStreak}</span>
                 <span className="text-sm text-muted-foreground hidden lg:inline">day streak</span>
               </div>
-              
+
               <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-secondary/50">
                 <BarChart3 className="w-5 h-5 text-primary" />
                 <span className="font-mono font-semibold text-foreground">{stats.completionRate}%</span>
@@ -69,8 +69,8 @@ export const Header = ({ stats }: HeaderProps) => {
               </div>
             </div>
 
-            <Button 
-              onClick={() => navigate('/commit')}
+            <Button
+              onClick={() => navigate('/')}
               className="bg-primary hover:bg-primary/90 glow-primary"
             >
               <Plus className="w-4 h-4 mr-2" />
