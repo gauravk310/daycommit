@@ -8,14 +8,12 @@ interface ContributionGridProps {
   year?: number;
   entriesMap: Map<string, DayEntry>;
   getStatusForDate: (date: Date) => Status;
-  onDayClick: (date: Date, entry?: DayEntry) => void;
 }
 
 export const ContributionGrid = ({
   year = new Date().getFullYear(),
   entriesMap,
   getStatusForDate,
-  onDayClick,
 }: ContributionGridProps) => {
   const days = useMemo(() => getYearDays(year), [year]);
   const weeks = useMemo(() => organizeByWeeks(days), [days]);
@@ -91,12 +89,11 @@ export const ContributionGrid = ({
                               status={status}
                               entry={entry}
                               isActive={isCurrentYear}
-                              onClick={() => onDayClick(day, entry)}
                             />
                           </div>
                         </TooltipTrigger>
-                        <TooltipContent 
-                          side="top" 
+                        <TooltipContent
+                          side="top"
                           className="bg-popover border-border text-popover-foreground max-w-xs"
                         >
                           <DayCellTooltip date={day} entry={entry} />
@@ -138,11 +135,11 @@ const DayCellTooltip = ({ date, entry }: { date: Date; entry?: DayEntry }) => {
         <p className="text-xs">
           <span className="text-muted-foreground">Status:</span>{' '}
           <span className={
-            entry.status === 'complete' ? 'text-primary' : 
-            entry.status === 'partial' ? 'text-warning' : 'text-destructive'
+            entry.status === 'complete' ? 'text-primary' :
+              entry.status === 'partial' ? 'text-warning' : 'text-destructive'
           }>
-            {entry.status === 'complete' ? '✓ Completed' : 
-             entry.status === 'partial' ? '◐ Partial' : '✗ None'}
+            {entry.status === 'complete' ? '✓ Completed' :
+              entry.status === 'partial' ? '◐ Partial' : '✗ None'}
           </span>
         </p>
         {entry.description && (

@@ -83,7 +83,6 @@ const Dashboard = () => {
               <ContributionGrid
                 entriesMap={entriesMap}
                 getStatusForDate={getStatusForDate}
-                onDayClick={handleDayClick}
               />
 
               {/* Bottom Section */}
