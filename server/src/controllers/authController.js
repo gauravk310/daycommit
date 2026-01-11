@@ -42,6 +42,7 @@ export const signup = async (req, res) => {
                 id: user._id,
                 name: user.name,
                 email: user.email,
+                createdAt: user.createdAt,
                 token,
             },
         });
@@ -98,6 +99,7 @@ export const login = async (req, res) => {
                 id: user._id,
                 name: user.name,
                 email: user.email,
+                createdAt: user.createdAt,
                 token,
             },
         });
@@ -123,6 +125,7 @@ export const getMe = async (req, res) => {
                 id: user._id,
                 name: user.name,
                 email: user.email,
+                createdAt: user.createdAt,
             },
         });
     } catch (error) {

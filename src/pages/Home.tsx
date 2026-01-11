@@ -7,12 +7,14 @@ import { Status } from '@/types';
 import { formatDate } from '@/lib/dateUtils';
 import { CheckCircle2, CircleDot, XCircle, GitCommitHorizontal, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isBefore, isAfter, addMonths, subMonths, startOfWeek, endOfWeek } from 'date-fns';
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isBefore, isAfter, addMonths, subMonths, startOfWeek, endOfWeek, startOfDay } from 'date-fns';
 import { toast } from '@/hooks/use-toast';
 import { Header } from '@/components/Header';
 import { useEntries } from '@/hooks/useEntries';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Home = () => {
+  const { user } = useAuth();
   const { stats, entries: hookEntries, addEntry, updateEntry, loading } = useEntries();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -148,8 +150,17 @@ const Home = () => {
         // Light green for past days with commits
         classes += 'border-green-500/30 bg-green-500/10 ';
       } else {
-        // Light red for past days without commits
-        classes += 'border-red-500/30 bg-red-500/10 ';
+        // Only show red if it's on or after account creation date
+        const creationDate = user?.createdAt ? startOfDay(new Date(user.createdAt)) : null;
+        const checkDate = startOfDay(date);
+
+        if (creationDate && (isSameDay(checkDate, creationDate) || isAfter(checkDate, creationDate))) {
+          // Light red for past days without commits (since creation)
+          classes += 'border-red-500/30 bg-red-500/10 ';
+        } else {
+          // Neutral for days before account creation
+          classes += 'border-border/10 bg-secondary/5 opacity-40 ';
+        }
       }
       classes += 'cursor-default ';
     }

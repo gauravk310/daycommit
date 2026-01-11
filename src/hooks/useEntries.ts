@@ -2,8 +2,11 @@ import { useState, useCallback, useMemo, useEffect } from 'react';
 import { DayEntry, Status, UserStats } from '@/types';
 import { formatDate, isPast, isToday } from '@/lib/dateUtils';
 import { apiService } from '@/services/api';
+import { useAuth } from '@/contexts/AuthContext';
+import { differenceInDays, startOfDay } from 'date-fns';
 
 export const useEntries = () => {
+  const { user } = useAuth();
   const [entries, setEntries] = useState<DayEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -181,15 +184,18 @@ export const useEntries = () => {
       }
     }
 
-    const totalDays = entries.length;
+    const totalDaysSinceCreation = user?.createdAt
+      ? Math.max(0, differenceInDays(startOfDay(new Date()), startOfDay(new Date(user.createdAt))) + 1)
+      : entries.length;
+
     const completedDays = completedEntries.length;
     const partialDays = partialEntries.length;
-    const completionRate = totalDays > 0 ? Math.round((completedDays / totalDays) * 100) : 0;
+    const completionRate = totalDaysSinceCreation > 0 ? Math.round((completedDays / totalDaysSinceCreation) * 100) : 0;
 
     return {
       currentStreak,
       longestStreak,
-      totalDays,
+      totalDays: totalDaysSinceCreation,
       completedDays,
       partialDays,
       completionRate,

@@ -4,6 +4,7 @@ interface User {
     id: string;
     name: string;
     email: string;
+    createdAt: string;
 }
 
 interface AuthContextType {
@@ -26,16 +27,40 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    // Load user from localStorage on mount
+    // Load user from localStorage on mount and refresh from API
     useEffect(() => {
-        const storedToken = localStorage.getItem('token');
-        const storedUser = localStorage.getItem('user');
+        const initializeAuth = async () => {
+            const storedToken = localStorage.getItem('token');
+            const storedUser = localStorage.getItem('user');
 
-        if (storedToken && storedUser) {
-            setToken(storedToken);
-            setUser(JSON.parse(storedUser));
-        }
-        setIsLoading(false);
+            if (storedToken) {
+                setToken(storedToken);
+                if (storedUser) {
+                    setUser(JSON.parse(storedUser));
+                }
+
+                try {
+                    // Fetch fresh user data to get createdAt if missing
+                    const response = await fetch(`${API_URL}/auth/me`, {
+                        headers: {
+                            'Authorization': `Bearer ${storedToken}`,
+                        },
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        const userData = data.data;
+                        setUser(userData);
+                        localStorage.setItem('user', JSON.stringify(userData));
+                    }
+                } catch (err) {
+                    console.error('Failed to refresh user data:', err);
+                }
+            }
+            setIsLoading(false);
+        };
+
+        initializeAuth();
     }, []);
 
     const login = async (email: string, password: string) => {
