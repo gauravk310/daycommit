@@ -317,18 +317,19 @@ const Commit = () => {
               </Button>
             </div>
 
-            {/* Achievement */}
-            <div className="grid grid-cols-2 gap-4">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Description */}
               <div>
-                <Label htmlFor="achievement" className="text-sm font-medium mb-2 block">
-                  Achievement
+                <Label htmlFor="description" className="text-sm font-medium mb-2 block">
+                  Commit Message *
                 </Label>
-                <Input
-                  id="achievement"
-                  placeholder="e.g., 3 hours, 5 tasks"
-                  value={achievement}
-                  onChange={(e) => setAchievement(e.target.value)}
-                  className="bg-secondary border-border"
+                <Textarea
+                  id="description"
+                  placeholder="e.g., Completed React tutorial, built dashboard component..."
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  className="bg-secondary border-border resize-none text-lg"
+                  rows={4}
                 />
               </div>
 
