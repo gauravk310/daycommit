@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import connectDB from './config/db.js';
+import authRoutes from './routes/authRoutes.js';
 import entryRoutes from './routes/entryRoutes.js';
 
 // Load environment variables
@@ -18,6 +19,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
+app.use('/api/auth', authRoutes);
 app.use('/api/entries', entryRoutes);
 
 // Health check route

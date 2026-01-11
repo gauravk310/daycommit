@@ -7,13 +7,17 @@ import {
     deleteEntry,
     getUserStats,
 } from '../controllers/entryController.js';
+import { protect } from '../middleware/auth.js';
 
 const router = express.Router();
 
+// All entry routes are protected - require authentication
+router.use(protect);
+
 // Entry routes
-router.get('/:userId', getEntries);
-router.get('/:userId/stats', getUserStats);
-router.get('/:userId/:date', getEntryByDate);
+router.get('/', getEntries);
+router.get('/stats', getUserStats);
+router.get('/:date', getEntryByDate);
 router.post('/', createEntry);
 router.put('/:id', updateEntry);
 router.delete('/:id', deleteEntry);
