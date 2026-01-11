@@ -221,30 +221,79 @@ const Commit = () => {
               </Button>
             </div>
 
-            {/* Date Picker */}
-            <div className="mb-6">
-              <Label className="text-sm font-medium mb-2 block">Date</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start text-left font-normal bg-secondary border-border"
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {format(date, 'EEEE, MMMM d, yyyy')}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0 bg-popover border-border" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={date}
-                    onSelect={(d) => d && setDate(d)}
-                    disabled={(d) => d > new Date()}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
+          {/* Weekday Headers */}
+          <div className="grid grid-cols-7 gap-2 md:gap-4 mb-4">
+            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+              <div key={day} className="text-center text-sm font-semibold text-muted-foreground py-2">
+                {day}
+              </div>
+            ))}
+          </div>
+
+          {/* Calendar Grid */}
+          <div className="grid grid-cols-7 gap-2 md:gap-4">
+            {calendarDays.map((day, idx) => {
+              const isToday = isSameDay(day, today);
+              const dayNum = format(day, 'd');
+              const dayStatus = getDayStatus(day);
+
+              return (
+                <div
+                  key={idx}
+                  onClick={() => handleDayClick(day)}
+                  className={getDayClasses(day)}
+                >
+                  <span className={cn(
+                    'text-sm md:text-base font-semibold',
+                    isToday ? 'text-primary' : 'text-foreground'
+                  )}>
+                    {dayNum}
+                  </span>
+                  {dayStatus && (
+                    <div className="absolute bottom-1 flex gap-0.5">
+                      {dayStatus === 'complete' && (
+                        <div className="w-1.5 h-1.5 rounded-full bg-success"></div>
+                      )}
+                      {dayStatus === 'partial' && (
+                        <div className="w-1.5 h-1.5 rounded-full bg-warning"></div>
+                      )}
+                      {dayStatus === 'none' && (
+                        <div className="w-1.5 h-1.5 rounded-full bg-destructive"></div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Legend */}
+          <div className="mt-8 pt-6 border-t border-border/50">
+            <div className="flex flex-wrap gap-6 justify-center text-sm">
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded border-2 border-primary bg-primary/10"></div>
+                <span className="text-muted-foreground">Today</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded border-2 border-success bg-success/20"></div>
+                <span className="text-muted-foreground">Complete</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded border-2 border-warning bg-warning/20"></div>
+                <span className="text-muted-foreground">Partial</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded border-2 border-destructive bg-destructive/20"></div>
+                <span className="text-muted-foreground">Rest Day</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded border-2 border-border/50 bg-secondary/50"></div>
+                <span className="text-muted-foreground">No Entry</span>
+              </div>
             </div>
+          </div>
+        </div>
+      </main>
 
             {/* Description */}
             <div className="mb-6">
