@@ -450,25 +450,20 @@ const Commit = () => {
                   onClick={() => setShowModal(false)}
                   className="flex-1"
                 >
-                  <span className="text-2xl">{cat.icon}</span>
-                  <span className="font-medium">{cat.label}</span>
-                </button>
-              ))}
-            </div>
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  className="flex-1 bg-primary hover:bg-primary/90 glow-primary"
+                >
+                  <GitCommitHorizontal className="w-5 h-5 mr-2" />
+                  Save Commit
+                </Button>
+              </div>
+            </form>
           </div>
-
-          {/* Submit Button */}
-          <Button
-            type="submit"
-            size="lg"
-            className="w-full h-14 text-lg font-semibold bg-primary hover:bg-primary/90 glow-primary animate-fade-up"
-            style={{ animationDelay: '300ms' }}
-          >
-            <GitCommitHorizontal className="w-5 h-5 mr-2" />
-            Save Commit
-          </Button>
-        </form>
-      </main>
+        </div>
+      )}
     </div>
   );
 };
