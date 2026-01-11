@@ -7,7 +7,6 @@ import { differenceInDays, parseISO, subDays } from 'date-fns';
 const generateDemoData = (): DayEntry[] => {
   const entries: DayEntry[] = [];
   const today = new Date();
-  const categories = ['coding', 'study', 'fitness', 'work', 'creative'] as const;
   const descriptions = [
     'Built new feature for the dashboard',
     'Completed algorithm practice',
@@ -18,12 +17,12 @@ const generateDemoData = (): DayEntry[] => {
     'Learned new framework concepts',
     'Team standup and sprint planning',
   ];
-  
+
   // Generate random entries for the past 180 days
   for (let i = 0; i < 180; i++) {
     const date = subDays(today, i);
     const random = Math.random();
-    
+
     // 70% chance of having an entry
     if (random > 0.3) {
       const status: Status = random > 0.5 ? 'complete' : 'partial';
@@ -33,14 +32,13 @@ const generateDemoData = (): DayEntry[] => {
         status,
         description: descriptions[Math.floor(Math.random() * descriptions.length)],
         achievement: `${Math.floor(Math.random() * 8) + 1} hours`,
-        category: categories[Math.floor(Math.random() * categories.length)],
         duration: Math.floor(Math.random() * 480) + 60,
         createdAt: date.toISOString(),
         updatedAt: date.toISOString(),
       });
     }
   }
-  
+
   return entries;
 };
 
@@ -78,8 +76,8 @@ export const useEntries = () => {
   }, []);
 
   const updateEntry = useCallback((id: string, updates: Partial<DayEntry>) => {
-    setEntries(prev => prev.map(entry => 
-      entry.id === id 
+    setEntries(prev => prev.map(entry =>
+      entry.id === id
         ? { ...entry, ...updates, updatedAt: new Date().toISOString() }
         : entry
     ));
@@ -93,11 +91,11 @@ export const useEntries = () => {
     const today = new Date();
     const completedEntries = entries.filter(e => e.status === 'complete');
     const partialEntries = entries.filter(e => e.status === 'partial');
-    
+
     // Calculate current streak
     let currentStreak = 0;
     let checkDate = today;
-    
+
     while (true) {
       const entry = entriesMap.get(formatDate(checkDate));
       if (entry && (entry.status === 'complete' || entry.status === 'partial')) {
@@ -114,7 +112,7 @@ export const useEntries = () => {
     let longestStreak = 0;
     let tempStreak = 0;
     const sortedDates = [...entriesMap.keys()].sort();
-    
+
     for (let i = 0; i < sortedDates.length; i++) {
       const entry = entriesMap.get(sortedDates[i]);
       if (entry && (entry.status === 'complete' || entry.status === 'partial')) {
