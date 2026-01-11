@@ -173,9 +173,9 @@ const Commit = () => {
       <header className="border-b border-border/50 backdrop-blur-xl bg-background/80 sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center gap-4">
-            <Button 
-              variant="ghost" 
-              size="icon" 
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={() => navigate('/')}
               className="hover:bg-secondary"
             >
@@ -186,21 +186,39 @@ const Commit = () => {
                 <GitCommitHorizontal className="w-6 h-6 text-primary" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-foreground">New Commit</h1>
-                <p className="text-xs text-muted-foreground">Log your daily progress</p>
+                <h1 className="text-xl font-bold text-foreground">Daily Commits</h1>
+                <p className="text-xs text-muted-foreground">Track your progress calendar</p>
               </div>
             </div>
           </div>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8 max-w-2xl">
-        <form onSubmit={handleSubmit} className="space-y-8">
-          {/* Commit Message Card */}
-          <div className="glass-card rounded-2xl p-8 animate-fade-up">
-            <div className="flex items-center gap-3 mb-6">
-              <Sparkles className="w-6 h-6 text-primary" />
-              <h2 className="text-2xl font-bold text-foreground">What did you accomplish?</h2>
+      <main className="container mx-auto px-4 py-8 max-w-5xl">
+        {/* Calendar Card */}
+        <div className="glass-card rounded-2xl p-6 md:p-8 animate-fade-up">
+          {/* Calendar Header */}
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-2xl font-bold text-foreground">
+              {format(currentMonth, 'MMMM yyyy')}
+            </h2>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={previousMonth}
+                className="hover:bg-secondary"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={nextMonth}
+                className="hover:bg-secondary"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </Button>
             </div>
 
             {/* Date Picker */}
