@@ -22,12 +22,66 @@ interface DayEntry {
 
 const Commit = () => {
   const navigate = useNavigate();
-  const [date, setDate] = useState<Date>(new Date());
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [showModal, setShowModal] = useState(false);
+  const [entries, setEntries] = useState<DayEntry[]>([]);
+
+  // Form state
   const [status, setStatus] = useState<Status>('complete');
   const [description, setDescription] = useState('');
   const [achievement, setAchievement] = useState('');
   const [category, setCategory] = useState<Category>('coding');
   const [duration, setDuration] = useState('60');
+
+  useEffect(() => {
+    // Load entries from localStorage
+    const storedEntries = JSON.parse(localStorage.getItem('daycommit-entries') || '[]');
+    setEntries(storedEntries);
+  }, []);
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const monthStart = startOfMonth(currentMonth);
+  const monthEnd = endOfMonth(currentMonth);
+  const calendarStart = startOfWeek(monthStart);
+  const calendarEnd = endOfWeek(monthEnd);
+
+  const calendarDays = eachDayOfInterval({ start: calendarStart, end: calendarEnd });
+
+  const getEntryForDate = (date: Date) => {
+    const dateStr = formatDate(date);
+    return entries.find(entry => entry.date === dateStr);
+  };
+
+  const getDayStatus = (date: Date) => {
+    const entry = getEntryForDate(date);
+    if (!entry) return null;
+    return entry.status;
+  };
+
+  const handleDayClick = (date: Date) => {
+    if (isSameDay(date, today)) {
+      setSelectedDate(date);
+      const existingEntry = getEntryForDate(date);
+      if (existingEntry) {
+        setStatus(existingEntry.status);
+        setDescription(existingEntry.description);
+        setAchievement(existingEntry.achievement);
+        setCategory(existingEntry.category);
+        setDuration(existingEntry.duration.toString());
+      } else {
+        // Reset form
+        setStatus('complete');
+        setDescription('');
+        setAchievement('');
+        setCategory('coding');
+        setDuration('60');
+      }
+      setShowModal(true);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
