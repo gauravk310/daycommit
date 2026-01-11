@@ -1,7 +1,8 @@
-import { GitCommitHorizontal, Flame, BarChart3, Plus } from 'lucide-react';
+import { GitCommitHorizontal, Flame, BarChart3, Plus, LogOut } from 'lucide-react';
 import { UserStats } from '@/types';
 import { Button } from '@/components/ui/button';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 
 interface HeaderProps {
@@ -11,6 +12,12 @@ interface HeaderProps {
 export const Header = ({ stats }: HeaderProps) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user, logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   return (
     <header className="border-b border-border/50 backdrop-blur-xl bg-background/80 sticky top-0 z-50">
@@ -69,14 +76,28 @@ export const Header = ({ stats }: HeaderProps) => {
               </div>
             </div>
 
-            <Button
-              onClick={() => navigate('/')}
-              className="bg-primary hover:bg-primary/90 glow-primary"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              <span className="hidden sm:inline">New Commit</span>
-              <span className="sm:hidden">Add</span>
-            </Button>
+            {user && (
+              <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-secondary/50">
+                <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+                  <span className="text-sm font-semibold text-primary">
+                    {user.name.charAt(0).toUpperCase()}
+                  </span>
+                </div>
+                <span className="text-sm font-medium text-foreground">{user.name}</span>
+              </div>
+            )}
+
+            {user && (
+              <Button
+                onClick={handleLogout}
+                variant="outline"
+                size="sm"
+                className="hidden sm:flex items-center gap-2"
+              >
+                <LogOut className="w-4 h-4" />
+                <span>Logout</span>
+              </Button>
+            )}
           </div>
         </div>
       </div>
