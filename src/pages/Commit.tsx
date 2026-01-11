@@ -111,14 +111,60 @@ const Commit = () => {
 
     const existingEntries = JSON.parse(localStorage.getItem('daycommit-entries') || '[]');
     const filteredEntries = existingEntries.filter((e: any) => e.date !== entry.date);
-    localStorage.setItem('daycommit-entries', JSON.stringify([...filteredEntries, entry]));
+    const newEntries = [...filteredEntries, entry];
+    localStorage.setItem('daycommit-entries', JSON.stringify(newEntries));
+    setEntries(newEntries);
 
     toast({
       title: "Commit saved! 🎉",
-      description: `Your progress for ${format(date, 'MMMM d')} has been logged.`,
+      description: `Your progress for ${format(selectedDate, 'MMMM d')} has been logged.`,
     });
 
-    navigate('/');
+    setShowModal(false);
+    setSelectedDate(null);
+  };
+
+  const getDayClasses = (date: Date) => {
+    const isToday = isSameDay(date, today);
+    const isPast = isBefore(date, today);
+    const isFuture = isAfter(date, today);
+    const isCurrentMonth = date.getMonth() === currentMonth.getMonth();
+    const dayStatus = getDayStatus(date);
+
+    let classes = 'calendar-day aspect-square flex flex-col items-center justify-center rounded-lg border-2 transition-all duration-200 relative ';
+
+    if (!isCurrentMonth) {
+      classes += 'opacity-30 ';
+    }
+
+    if (isFuture) {
+      classes += 'border-border/30 bg-secondary/20 cursor-not-allowed opacity-50 ';
+    } else if (isToday) {
+      classes += 'border-primary bg-primary/10 cursor-pointer hover:bg-primary/20 hover:scale-105 ring-2 ring-primary/50 ';
+    } else if (isPast) {
+      if (dayStatus) {
+        if (dayStatus === 'complete') {
+          classes += 'border-success bg-success/20 ';
+        } else if (dayStatus === 'partial') {
+          classes += 'border-warning bg-warning/20 ';
+        } else if (dayStatus === 'none') {
+          classes += 'border-destructive bg-destructive/20 ';
+        }
+      } else {
+        classes += 'border-border/50 bg-secondary/50 ';
+      }
+      classes += 'cursor-default ';
+    }
+
+    return classes;
+  };
+
+  const previousMonth = () => {
+    setCurrentMonth(subMonths(currentMonth, 1));
+  };
+
+  const nextMonth = () => {
+    setCurrentMonth(addMonths(currentMonth, 1));
   };
 
   return (
