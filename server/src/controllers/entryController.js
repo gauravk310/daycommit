@@ -1,11 +1,11 @@
 import DayEntry from '../models/DayEntry.js';
 
-// @desc    Get all entries for a user
-// @route   GET /api/entries/:userId
-// @access  Public (should be protected with auth in production)
+// @desc    Get all entries for authenticated user
+// @route   GET /api/entries
+// @access  Private
 export const getEntries = async (req, res) => {
     try {
-        const { userId } = req.params;
+        const userId = req.user.id;
         const entries = await DayEntry.find({ userId }).sort({ date: -1 });
 
         res.status(200).json({
@@ -21,12 +21,13 @@ export const getEntries = async (req, res) => {
     }
 };
 
-// @desc    Get a single entry for a user by date
-// @route   GET /api/entries/:userId/:date
-// @access  Public
+// @desc    Get a single entry for authenticated user by date
+// @route   GET /api/entries/:date
+// @access  Private
 export const getEntryByDate = async (req, res) => {
     try {
-        const { userId, date } = req.params;
+        const userId = req.user.id;
+        const { date } = req.params;
         const entry = await DayEntry.findOne({ userId, date });
 
         if (!entry) {
@@ -50,16 +51,17 @@ export const getEntryByDate = async (req, res) => {
 
 // @desc    Create a new entry
 // @route   POST /api/entries
-// @access  Public
+// @access  Private
 export const createEntry = async (req, res) => {
     try {
-        const { userId, date, status, description, achievement, duration } = req.body;
+        const userId = req.user.id;
+        const { date, status, description, achievement, duration } = req.body;
 
         // Validation
-        if (!userId || !date || !status || !description || !achievement) {
+        if (!date || !status || !description || !achievement) {
             return res.status(400).json({
                 success: false,
-                error: 'Please provide all required fields: userId, date, status, description, achievement',
+                error: 'Please provide all required fields: date, status, description, achievement',
             });
         }
 
@@ -95,9 +97,10 @@ export const createEntry = async (req, res) => {
 
 // @desc    Update an entry
 // @route   PUT /api/entries/:id
-// @access  Public
+// @access  Private
 export const updateEntry = async (req, res) => {
     try {
+        const userId = req.user.id;
         const { id } = req.params;
         const { status, description, achievement, duration } = req.body;
 
@@ -107,6 +110,14 @@ export const updateEntry = async (req, res) => {
             return res.status(404).json({
                 success: false,
                 error: 'Entry not found',
+            });
+        }
+
+        // Check ownership
+        if (entry.userId !== userId) {
+            return res.status(403).json({
+                success: false,
+                error: 'Not authorized to update this entry',
             });
         }
 
@@ -132,9 +143,10 @@ export const updateEntry = async (req, res) => {
 
 // @desc    Delete an entry
 // @route   DELETE /api/entries/:id
-// @access  Public
+// @access  Private
 export const deleteEntry = async (req, res) => {
     try {
+        const userId = req.user.id;
         const { id } = req.params;
 
         const entry = await DayEntry.findById(id);
@@ -143,6 +155,14 @@ export const deleteEntry = async (req, res) => {
             return res.status(404).json({
                 success: false,
                 error: 'Entry not found',
+            });
+        }
+
+        // Check ownership
+        if (entry.userId !== userId) {
+            return res.status(403).json({
+                success: false,
+                error: 'Not authorized to delete this entry',
             });
         }
 
@@ -162,11 +182,11 @@ export const deleteEntry = async (req, res) => {
 };
 
 // @desc    Get user statistics
-// @route   GET /api/entries/:userId/stats
-// @access  Public
+// @route   GET /api/entries/stats
+// @access  Private
 export const getUserStats = async (req, res) => {
     try {
-        const { userId } = req.params;
+        const userId = req.user.id;
         const entries = await DayEntry.find({ userId }).sort({ date: 1 });
 
         const completedEntries = entries.filter(e => e.status === 'complete');
