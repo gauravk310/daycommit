@@ -220,6 +220,7 @@ const Commit = () => {
                 <ChevronRight className="w-5 h-5" />
               </Button>
             </div>
+          </div>
 
           {/* Weekday Headers */}
           <div className="grid grid-cols-7 gap-2 md:gap-4 mb-4">
@@ -295,19 +296,25 @@ const Commit = () => {
         </div>
       </main>
 
-            {/* Description */}
-            <div className="mb-6">
-              <Label htmlFor="description" className="text-sm font-medium mb-2 block">
-                Commit Message *
-              </Label>
-              <Textarea
-                id="description"
-                placeholder="e.g., Completed React tutorial, built dashboard component..."
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                className="bg-secondary border-border resize-none text-lg"
-                rows={4}
-              />
+      {/* Commit Modal */}
+      {showModal && selectedDate && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="glass-card rounded-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto animate-scale-in">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <Sparkles className="w-6 h-6 text-primary" />
+                <h2 className="text-2xl font-bold text-foreground">
+                  Commit for {format(selectedDate, 'MMMM d, yyyy')}
+                </h2>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowModal(false)}
+                className="hover:bg-secondary"
+              >
+                <XCircle className="w-5 h-5" />
+              </Button>
             </div>
 
             {/* Achievement */}
@@ -324,18 +331,91 @@ const Commit = () => {
                   className="bg-secondary border-border"
                 />
               </div>
+
+              {/* Achievement & Duration */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="achievement" className="text-sm font-medium mb-2 block">
+                    Achievement
+                  </Label>
+                  <Input
+                    id="achievement"
+                    placeholder="e.g., 3 hours, 5 tasks"
+                    value={achievement}
+                    onChange={(e) => setAchievement(e.target.value)}
+                    className="bg-secondary border-border"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="duration" className="text-sm font-medium mb-2 block">
+                    Duration (minutes)
+                  </Label>
+                  <Input
+                    id="duration"
+                    type="number"
+                    placeholder="60"
+                    value={duration}
+                    onChange={(e) => setDuration(e.target.value)}
+                    className="bg-secondary border-border"
+                  />
+                </div>
+              </div>
+
+              {/* Status Selection */}
               <div>
-                <Label htmlFor="duration" className="text-sm font-medium mb-2 block">
-                  Duration (minutes)
-                </Label>
-                <Input
-                  id="duration"
-                  type="number"
-                  placeholder="60"
-                  value={duration}
-                  onChange={(e) => setDuration(e.target.value)}
-                  className="bg-secondary border-border"
-                />
+                <h3 className="text-lg font-semibold text-foreground mb-4">Progress Status</h3>
+                <div className="grid grid-cols-3 gap-4">
+                  <button
+                    type="button"
+                    onClick={() => setStatus('complete')}
+                    className={cn(
+                      'flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all',
+                      status === 'complete'
+                        ? 'border-primary bg-primary/10 shadow-lg shadow-primary/20'
+                        : 'border-border hover:border-primary/50'
+                    )}
+                  >
+                    <CheckCircle2 className={cn(
+                      'w-8 h-8',
+                      status === 'complete' ? 'text-primary' : 'text-muted-foreground'
+                    )} />
+                    <span className="text-sm font-medium">Complete</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setStatus('partial')}
+                    className={cn(
+                      'flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all',
+                      status === 'partial'
+                        ? 'border-warning bg-warning/10 shadow-lg shadow-warning/20'
+                        : 'border-border hover:border-warning/50'
+                    )}
+                  >
+                    <CircleDot className={cn(
+                      'w-8 h-8',
+                      status === 'partial' ? 'text-warning' : 'text-muted-foreground'
+                    )} />
+                    <span className="text-sm font-medium">Partial</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setStatus('none')}
+                    className={cn(
+                      'flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all',
+                      status === 'none'
+                        ? 'border-destructive bg-destructive/10 shadow-lg shadow-destructive/20'
+                        : 'border-border hover:border-destructive/50'
+                    )}
+                  >
+                    <XCircle className={cn(
+                      'w-8 h-8',
+                      status === 'none' ? 'text-destructive' : 'text-muted-foreground'
+                    )} />
+                    <span className="text-sm font-medium">Rest Day</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
