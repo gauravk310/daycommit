@@ -1,9 +1,20 @@
-import { GitCommitHorizontal, Flame, BarChart3, Plus, LogOut } from 'lucide-react';
+import { Flame, BarChart3, Plus, LogOut } from 'lucide-react';
 import { UserStats } from '@/types';
 import { Button } from '@/components/ui/button';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface HeaderProps {
   stats: UserStats;
@@ -25,8 +36,8 @@ export const Header = ({ stats }: HeaderProps) => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-6">
             <button onClick={() => navigate('/')} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-              <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center glow-primary">
-                <GitCommitHorizontal className="w-6 h-6 text-primary" />
+              <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center glow-primary border border-primary/30">
+                <span className="text-2xl font-black text-primary italic leading-none">C</span>
               </div>
               <div>
                 <h1 className="text-xl font-bold text-foreground">DayCommit</h1>
@@ -88,15 +99,32 @@ export const Header = ({ stats }: HeaderProps) => {
             )}
 
             {user && (
-              <Button
-                onClick={handleLogout}
-                variant="outline"
-                size="sm"
-                className="hidden sm:flex items-center gap-2"
-              >
-                <LogOut className="w-4 h-4" />
-                <span>Logout</span>
-              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="hidden sm:flex items-center gap-2"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span>Logout</span>
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Are you sure you want to logout?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      You will need to login again to access your account and track your progress.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleLogout} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                      Logout
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             )}
           </div>
         </div>
