@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { DayEntry, Category, Status, CATEGORIES } from '@/types';
+import { DayEntry, Status } from '@/types';
 import { formatDisplayDate, formatDate } from '@/lib/dateUtils';
 import { CheckCircle2, CircleDot, XCircle, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -30,7 +30,6 @@ export const DayEntryModal = ({
   const [status, setStatus] = useState<Status>('complete');
   const [description, setDescription] = useState('');
   const [achievement, setAchievement] = useState('');
-  const [category, setCategory] = useState<Category>('coding');
   const [duration, setDuration] = useState('60');
 
   useEffect(() => {
@@ -38,26 +37,23 @@ export const DayEntryModal = ({
       setStatus(entry.status);
       setDescription(entry.description);
       setAchievement(entry.achievement);
-      setCategory(entry.category);
       setDuration(String(entry.duration || 60));
     } else {
       setStatus('complete');
       setDescription('');
       setAchievement('');
-      setCategory('coding');
       setDuration('60');
     }
   }, [entry, isOpen]);
 
   const handleSave = () => {
     if (!date) return;
-    
+
     onSave({
       date: formatDate(date),
       status,
       description,
       achievement,
-      category,
       duration: parseInt(duration) || 60,
     });
     onClose();
@@ -93,8 +89,8 @@ export const DayEntryModal = ({
                 onClick={() => setStatus('complete')}
                 className={cn(
                   'flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all',
-                  status === 'complete' 
-                    ? 'border-primary bg-primary/10' 
+                  status === 'complete'
+                    ? 'border-primary bg-primary/10'
                     : 'border-border hover:border-primary/50'
                 )}
               >
@@ -104,13 +100,13 @@ export const DayEntryModal = ({
                 )} />
                 <span className="text-sm font-medium">Complete</span>
               </button>
-              
+
               <button
                 onClick={() => setStatus('partial')}
                 className={cn(
                   'flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all',
-                  status === 'partial' 
-                    ? 'border-warning bg-warning/10' 
+                  status === 'partial'
+                    ? 'border-warning bg-warning/10'
                     : 'border-border hover:border-warning/50'
                 )}
               >
@@ -120,13 +116,13 @@ export const DayEntryModal = ({
                 )} />
                 <span className="text-sm font-medium">Partial</span>
               </button>
-              
+
               <button
                 onClick={() => setStatus('none')}
                 className={cn(
                   'flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all',
-                  status === 'none' 
-                    ? 'border-destructive bg-destructive/10' 
+                  status === 'none'
+                    ? 'border-destructive bg-destructive/10'
                     : 'border-border hover:border-destructive/50'
                 )}
               >
@@ -139,26 +135,7 @@ export const DayEntryModal = ({
             </div>
           </div>
 
-          {/* Category Selection */}
-          <div className="space-y-3">
-            <Label className="text-sm font-medium">Category</Label>
-            <div className="flex flex-wrap gap-2">
-              {CATEGORIES.map((cat) => (
-                <button
-                  key={cat.value}
-                  onClick={() => setCategory(cat.value)}
-                  className={cn(
-                    'px-4 py-2 rounded-full text-sm font-medium transition-all',
-                    category === cat.value
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
-                  )}
-                >
-                  {cat.icon} {cat.label}
-                </button>
-              ))}
-            </div>
-          </div>
+
 
           {/* Description */}
           <div className="space-y-2">
