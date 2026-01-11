@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { DayCell } from './DayCell';
-import { getYearDays, organizeByWeeks, getMonthLabels, formatDate } from '@/lib/dateUtils';
+import { getYearDays, organizeByWeeks, getMonthLabels, formatDate, isFuture } from '@/lib/dateUtils';
 import { DayEntry, Status } from '@/types';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
@@ -8,12 +8,14 @@ interface ContributionGridProps {
   year?: number;
   entriesMap: Map<string, DayEntry>;
   getStatusForDate: (date: Date) => Status;
+  onDayClick?: (date: Date, entry?: DayEntry) => void;
 }
 
 export const ContributionGrid = ({
   year = new Date().getFullYear(),
   entriesMap,
   getStatusForDate,
+  onDayClick,
 }: ContributionGridProps) => {
   const days = useMemo(() => getYearDays(year), [year]);
   const weeks = useMemo(() => organizeByWeeks(days), [days]);
@@ -89,6 +91,7 @@ export const ContributionGrid = ({
                               status={status}
                               entry={entry}
                               isActive={isCurrentYear}
+                              onClick={() => !isFuture(day) && onDayClick?.(day, entry)}
                             />
                           </div>
                         </TooltipTrigger>

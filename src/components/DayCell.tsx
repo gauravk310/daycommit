@@ -48,11 +48,12 @@ export const DayCell = ({ date, status, entry, isActive = true, onClick }: DayCe
 
   return (
     <div
+      onClick={onClick}
       className={cn(
-        'w-3 h-3 contribution-cell',
+        'w-3 h-3 contribution-cell cursor-pointer transition-all hover:scale-110',
         getCellClass(),
         today && 'ring-2 ring-primary ring-offset-1 ring-offset-background',
-        future && 'opacity-50'
+        future && 'opacity-50 cursor-not-allowed'
       )}
       aria-label={`${date.toDateString()}${entry ? `: ${entry.description}` : ''}`}
     />

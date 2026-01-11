@@ -13,7 +13,7 @@ import { Header } from '@/components/Header';
 import { useEntries } from '@/hooks/useEntries';
 
 const Home = () => {
-  const { stats, entries: hookEntries } = useEntries();
+  const { stats, entries: hookEntries, addEntry, updateEntry, loading } = useEntries();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [showModal, setShowModal] = useState(false);
@@ -25,10 +25,7 @@ const Home = () => {
   const [duration, setDuration] = useState('60');
 
   // Use localStorage entries for the calendar display
-  const [localEntries, setLocalEntries] = useState(() => {
-    const storedEntries = JSON.parse(localStorage.getItem('daycommit-entries') || '[]');
-    return storedEntries;
-  });
+  // No longer using localEntries state, using hookEntries from useEntries instead
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -42,7 +39,7 @@ const Home = () => {
 
   const getEntryForDate = (date: Date) => {
     const dateStr = formatDate(date);
-    return localEntries.find((entry: any) => entry.date === dateStr);
+    return hookEntries.find((entry: any) => entry.date === dateStr);
   };
 
   const getDayStatus = (date: Date) => {
@@ -71,7 +68,7 @@ const Home = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!description.trim()) {
@@ -83,32 +80,50 @@ const Home = () => {
       return;
     }
 
+    if (!achievement.trim()) {
+      toast({
+        title: "Achievement required",
+        description: "Please log an achievement for today.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (!selectedDate) return;
 
-    const entry = {
-      id: `entry-${Date.now()}`,
-      date: formatDate(selectedDate),
-      status,
-      description: description.trim(),
-      achievement: achievement.trim(),
-      duration: parseInt(duration) || 60,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
+    try {
+      const existingEntry = getEntryForDate(selectedDate);
+      const entryData = {
+        date: formatDate(selectedDate),
+        status,
+        description: description.trim(),
+        achievement: achievement.trim(),
+        duration: parseInt(duration) || 60,
+      };
 
-    const existingEntries = JSON.parse(localStorage.getItem('daycommit-entries') || '[]');
-    const filteredEntries = existingEntries.filter((e: any) => e.date !== entry.date);
-    const newEntries = [...filteredEntries, entry];
-    localStorage.setItem('daycommit-entries', JSON.stringify(newEntries));
-    setLocalEntries(newEntries);
+      if (existingEntry) {
+        await updateEntry(existingEntry.id, entryData);
+        toast({
+          title: "Commit updated! 🔄",
+          description: `Your progress for ${format(selectedDate, 'MMMM d')} has been updated.`,
+        });
+      } else {
+        await addEntry(entryData);
+        toast({
+          title: "Commit saved! 🎉",
+          description: `Your progress for ${format(selectedDate, 'MMMM d')} has been logged.`,
+        });
+      }
 
-    toast({
-      title: "Commit saved! 🎉",
-      description: `Your progress for ${format(selectedDate, 'MMMM d')} has been logged.`,
-    });
-
-    setShowModal(false);
-    setSelectedDate(null);
+      setShowModal(false);
+      setSelectedDate(null);
+    } catch (error) {
+      toast({
+        title: "Failed to save commit",
+        description: error instanceof Error ? error.message : "Something went wrong",
+        variant: "destructive",
+      });
+    }
   };
 
   const getDayClasses = (date: Date) => {
