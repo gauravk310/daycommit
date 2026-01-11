@@ -1,18 +1,24 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Category, Status, CATEGORIES } from '@/types';
-import { formatDate, formatDisplayDate } from '@/lib/dateUtils';
-import { CheckCircle2, CircleDot, XCircle, ArrowLeft, GitCommitHorizontal, Sparkles } from 'lucide-react';
+import { formatDate } from '@/lib/dateUtils';
+import { CheckCircle2, CircleDot, XCircle, ArrowLeft, GitCommitHorizontal, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { CalendarIcon } from 'lucide-react';
-import { format } from 'date-fns';
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isBefore, isAfter, addMonths, subMonths, startOfWeek, endOfWeek } from 'date-fns';
 import { toast } from '@/hooks/use-toast';
+
+interface DayEntry {
+  date: string;
+  status: Status;
+  description: string;
+  achievement: string;
+  category: Category;
+  duration: number;
+}
 
 const Commit = () => {
   const navigate = useNavigate();
