@@ -85,7 +85,7 @@ const Commit = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!description.trim()) {
       toast({
         title: "Description required",
@@ -95,10 +95,11 @@ const Commit = () => {
       return;
     }
 
-    // Store in localStorage for now (will be replaced with database)
+    if (!selectedDate) return;
+
     const entry = {
       id: `entry-${Date.now()}`,
-      date: formatDate(date),
+      date: formatDate(selectedDate),
       status,
       description: description.trim(),
       achievement: achievement.trim(),
