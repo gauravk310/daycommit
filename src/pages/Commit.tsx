@@ -418,84 +418,37 @@ const Commit = () => {
                   </button>
                 </div>
               </div>
-            </div>
-          </div>
 
-          {/* Status Selection */}
-          <div className="glass-card rounded-2xl p-8 animate-fade-up" style={{ animationDelay: '100ms' }}>
-            <h3 className="text-lg font-semibold text-foreground mb-4">Progress Status</h3>
-            <div className="grid grid-cols-3 gap-4">
-              <button
-                type="button"
-                onClick={() => setStatus('complete')}
-                className={cn(
-                  'flex flex-col items-center gap-3 p-6 rounded-xl border-2 transition-all',
-                  status === 'complete' 
-                    ? 'border-primary bg-primary/10 shadow-lg shadow-primary/20' 
-                    : 'border-border hover:border-primary/50'
-                )}
-              >
-                <CheckCircle2 className={cn(
-                  'w-10 h-10',
-                  status === 'complete' ? 'text-primary' : 'text-muted-foreground'
-                )} />
-                <span className="text-sm font-medium">Complete</span>
-                <span className="text-xs text-muted-foreground">Fully done</span>
-              </button>
-              
-              <button
-                type="button"
-                onClick={() => setStatus('partial')}
-                className={cn(
-                  'flex flex-col items-center gap-3 p-6 rounded-xl border-2 transition-all',
-                  status === 'partial' 
-                    ? 'border-warning bg-warning/10 shadow-lg shadow-warning/20' 
-                    : 'border-border hover:border-warning/50'
-                )}
-              >
-                <CircleDot className={cn(
-                  'w-10 h-10',
-                  status === 'partial' ? 'text-warning' : 'text-muted-foreground'
-                )} />
-                <span className="text-sm font-medium">Partial</span>
-                <span className="text-xs text-muted-foreground">Some progress</span>
-              </button>
-              
-              <button
-                type="button"
-                onClick={() => setStatus('none')}
-                className={cn(
-                  'flex flex-col items-center gap-3 p-6 rounded-xl border-2 transition-all',
-                  status === 'none' 
-                    ? 'border-destructive bg-destructive/10 shadow-lg shadow-destructive/20' 
-                    : 'border-border hover:border-destructive/50'
-                )}
-              >
-                <XCircle className={cn(
-                  'w-10 h-10',
-                  status === 'none' ? 'text-destructive' : 'text-muted-foreground'
-                )} />
-                <span className="text-sm font-medium">Rest Day</span>
-                <span className="text-xs text-muted-foreground">No work</span>
-              </button>
-            </div>
-          </div>
+              {/* Category Selection */}
+              <div>
+                <h3 className="text-lg font-semibold text-foreground mb-4">Category</h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {CATEGORIES.map((cat) => (
+                    <button
+                      key={cat.value}
+                      type="button"
+                      onClick={() => setCategory(cat.value)}
+                      className={cn(
+                        'flex items-center gap-3 px-4 py-3 rounded-xl border-2 transition-all text-left',
+                        category === cat.value
+                          ? 'border-primary bg-primary/10'
+                          : 'border-border hover:border-primary/50'
+                      )}
+                    >
+                      <span className="text-2xl">{cat.icon}</span>
+                      <span className="font-medium">{cat.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
 
-          {/* Category Selection */}
-          <div className="glass-card rounded-2xl p-8 animate-fade-up" style={{ animationDelay: '200ms' }}>
-            <h3 className="text-lg font-semibold text-foreground mb-4">Category</h3>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {CATEGORIES.map((cat) => (
-                <button
-                  key={cat.value}
+              {/* Submit Button */}
+              <div className="flex gap-4 pt-4">
+                <Button
                   type="button"
-                  onClick={() => setCategory(cat.value)}
-                  className={cn(
-                    'flex items-center gap-3 px-4 py-3 rounded-xl border-2 transition-all text-left',
-                    category === cat.value
-                      ? 'border-primary bg-primary/10'
-                      : 'border-border hover:border-primary/50'
-                  )}
+                  variant="outline"
+                  onClick={() => setShowModal(false)}
+                  className="flex-1"
                 >
                   <span className="text-2xl">{cat.icon}</span>
                   <span className="font-medium">{cat.label}</span>
