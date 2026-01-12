@@ -30,9 +30,13 @@ git clone <YOUR_GIT_URL>
 cd <YOUR_PROJECT_NAME>
 
 # Step 3: Install the necessary dependencies.
+cd app
+npm i
+cd ../server
 npm i
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Step 4: Start the development server.
+# From the root directory:
 npm run dev
 ```
 
