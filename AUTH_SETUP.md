@@ -34,7 +34,12 @@ npm run dev
 
 **Frontend:**
 ```bash
-# From root directory
+cd app
+npm run dev
+```
+
+Or from the root directory:
+```bash
 npm run dev
 ```
 
